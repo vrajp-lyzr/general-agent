@@ -1,0 +1,9 @@
+name: whereami
+description: Print the absolute working directory this GAP script tool executes in, plus the git branch there.
+parameters:
+  type: object
+  properties: {}
+implementation:
+  script:
+    command: /bin/sh
+    args: ["-c", "echo CWD=$(pwd); echo BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"]
