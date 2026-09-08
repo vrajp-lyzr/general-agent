@@ -43,4 +43,4 @@ orchestration:
   # return to), which means the default config computes no scorecard at all.
   collect: gate
   budget_usd: 5
-  worker_mcp: inherit   # inherit | none | [server names]
+  worker_mcp: [deepwiki_typo]   # T5 branch
