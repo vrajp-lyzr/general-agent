@@ -1,0 +1,10 @@
+# REFERENCED worker, SHARED session id — executes separately (own clone, own
+# worktree, own scope-guard) but its telemetry folds into the orchestrator's
+# session doc instead of appearing as a nested child row.
+use: github.com/vrajp-lyzr/general-agent
+separate_session: false
+scope:
+  write: ["src/b/**"]
+  read: ["**"]
+budget_usd: 2
+max_turns: 10

@@ -1,0 +1,14 @@
+# REFERENCED worker, own session (a fork).
+#
+# ⚠️ Crew files are only consulted on the `isolation: none` dispatch branch
+# (roster-run.ts routes `worktree` to dispatchWorktreeRoster, which builds
+# workers INLINE from the roster JSON and never reads spec.workers). With the
+# `isolation: worktree` set in agent.yaml these files are inert — switch to
+# `isolation: none` to exercise them.
+use: github.com/vrajp-lyzr/general-agent
+separate_session: true
+scope:
+  write: ["src/a/**"]
+  read: ["**"]
+budget_usd: 2
+max_turns: 10

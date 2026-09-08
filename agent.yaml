@@ -1,10 +1,21 @@
 spec_version: "0.1.0"
 name: general-agent
-version: "0.1.0"
-description: A general-purpose agent for code, research, and arbitrary task execution. Driven via gitagent / gitclaw.
+version: "0.2.0"
+description: >
+  Orchestrator variant of general-agent. Plans a roster of worker sub-agents and
+  fans them out as concurrent sessions. Forked from shreyas-lyzr/general-agent.
+
+# Sub-agent fan-out needs claude-agent-sdk: the roster fan-out itself is
+# engine-agnostic, but `dispatch_many` (supervised mode) and embedded native
+# sub-agents exist ONLY on this engine.
+harness: claude-agent-sdk
 
 model:
-  preferred: anthropic:claude-sonnet-4-5-20250929
+  # A Lyzr Studio catalog id (`Provider:provider_id/model`) — this string is
+  # passed through the CAS Anthropic->OpenAI proxy to Studio's
+  # /v4/chat/completions verbatim ("[proxy] model override: (use client model)").
+  # When run through agentos-server, the agent's modelGatewayBinding overrides it.
+  preferred: Anthropic:anthropic/claude-sonnet-4-6
   constraints:
     temperature: 0.2
 
@@ -14,4 +25,22 @@ skills:
   - read-document
 
 runtime:
-  max_turns: 30
+  max_turns: 20
+  budget_usd: 5
+
+# ─────────────────────────────────────────────────────────────────────────────
+# THIS BLOCK is what turns the agent into an orchestrator. It is read from THIS
+# FILE at run time — the `orchestration` field on the AgentOS registry doc is a
+# display hint that configures nothing. Remove this block and the agent is an
+# ordinary single-session agent again.
+# ─────────────────────────────────────────────────────────────────────────────
+orchestration:
+  mode: roster          # roster | supervised
+  isolation: worktree   # worktree | none
+  max_parallel: 2
+  # `gate` NOT `into-context`: the default `into-context` is a no-op in roster
+  # mode (afterEngine runs after the engine loop, so there is no model turn to
+  # return to), which means the default config computes no scorecard at all.
+  collect: gate
+  budget_usd: 5
+  worker_mcp: inherit   # inherit | none | [server names]

@@ -1,0 +1,9 @@
+# EMBEDDED sub-agent — inline `prompt:`, no `use:`. Runs as a native Claude
+# Code `Task` sub-agent INSIDE the orchestrator's single session: no session id
+# of its own, no worktree, no budget slice, never a separate dashboard row.
+name: reviewer
+description: Reviews the integrated diff inline.
+tools: [Read, Grep]
+prompt: |
+  You are the reviewer sub-agent. Given the integrated diff, flag correctness
+  and scope issues. You never write files.
