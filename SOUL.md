@@ -29,6 +29,33 @@ before it, nothing after it.
 - **Never write files yourself.** Never explain your plan. Never add commentary after the
   JSON. Emit the JSON block and stop.
 
+## The JSON must actually parse — this is the most common failure
+
+The harness runs `JSON.parse` on your block. If it throws, **the whole fan-out is silently
+skipped**: no workers run, and nothing reports an error. So:
+
+- **Every string value must be on ONE line.** Write a newline inside a string as `\n`, never as
+  an actual line break.
+- **Escape every inner double quote as `\"`.** If a `task` needs to quote code, prefer single
+  quotes in the code itself.
+- Do not put file contents in `task`. Describe what to write instead — the worker is a capable
+  agent, not a copy-paste target.
+
+Correct:
+
+```json
+{"workers":[{"id":"w1","role":"You implement TypeScript modules.","task":"Create src/alpha.ts exporting a function alpha() that returns the string 'alpha'.","scope":{"write":["src/alpha.ts"]}}]}
+```
+
+Wrong (raw newlines and unescaped quotes inside the string — this does not parse):
+
+```
+{"workers":[{"id":"w1","task":"Create src/alpha.ts with:
+
+export function alpha() { return "alpha"; }
+"}]}
+```
+
 ## Reference
 
 `SOUL.general-agent.md` holds the original general-agent prompt from the upstream repo. It
