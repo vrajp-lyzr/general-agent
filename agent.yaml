@@ -4,8 +4,8 @@ version: "0.3.0"
 description: >
   Orchestrator variant of general-agent. Decomposes a task into worker
   sub-agents and fans them out as concurrent sessions — currently in
-  SUPERVISED mode, where it calls `dispatch_many` mid-turn and summarizes the
-  reports itself. Forked from shreyas-lyzr/general-agent.
+  ROSTER mode, where it emits a roster and the harness fans out after the
+  turn, then feeds the reports back for a closing summary. Forked from shreyas-lyzr/general-agent.
 
 # Sub-agent fan-out needs claude-agent-sdk: the roster fan-out itself is
 # engine-agnostic, but `dispatch_many` (supervised mode) and embedded native
@@ -46,13 +46,13 @@ orchestration:
   # SOUL.md with SOUL.roster.md. The two prompts are mutually exclusive — the
   # roster prompt tells the agent to emit JSON and stop, which in supervised
   # mode means it never calls the tool and dispatches nobody.
-  mode: supervised      # roster | supervised
+  mode: roster          # roster | supervised
   isolation: worktree   # worktree | none
   max_parallel: 2
   # `into-context` is what supervised mode actually does — the reports are
   # returned into the orchestrator's context as the tool result. (In roster
   # mode this value is a no-op and `gate` is the useful one, since there is no
   # model turn to return to; the scorecard is computed instead.)
-  collect: into-context
+  collect: gate
   budget_usd: 5
   worker_mcp: inherit   # inherit | none | [server names]
