@@ -1,9 +1,11 @@
 spec_version: "0.1.0"
 name: general-agent
-version: "0.2.0"
+version: "0.3.0"
 description: >
-  Orchestrator variant of general-agent. Plans a roster of worker sub-agents and
-  fans them out as concurrent sessions. Forked from shreyas-lyzr/general-agent.
+  Orchestrator variant of general-agent. Decomposes a task into worker
+  sub-agents and fans them out as concurrent sessions — currently in
+  SUPERVISED mode, where it calls `dispatch_many` mid-turn and summarizes the
+  reports itself. Forked from shreyas-lyzr/general-agent.
 
 # Sub-agent fan-out needs claude-agent-sdk: the roster fan-out itself is
 # engine-agnostic, but `dispatch_many` (supervised mode) and embedded native
@@ -35,12 +37,22 @@ runtime:
 # ordinary single-session agent again.
 # ─────────────────────────────────────────────────────────────────────────────
 orchestration:
-  mode: roster          # roster | supervised
+  # SUPERVISED: the orchestrator calls `mcp__orchestration__dispatch_many`
+  # mid-turn, the workers run as their own concurrent sessions, and their
+  # reports come back as the tool result — so the closing summary is written
+  # inside the same turn, with no second model call.
+  #
+  # To flip back to roster mode: set `mode: roster`, `collect: gate`, and swap
+  # SOUL.md with SOUL.roster.md. The two prompts are mutually exclusive — the
+  # roster prompt tells the agent to emit JSON and stop, which in supervised
+  # mode means it never calls the tool and dispatches nobody.
+  mode: supervised      # roster | supervised
   isolation: worktree   # worktree | none
   max_parallel: 2
-  # `gate` NOT `into-context`: the default `into-context` is a no-op in roster
-  # mode (afterEngine runs after the engine loop, so there is no model turn to
-  # return to), which means the default config computes no scorecard at all.
-  collect: gate
+  # `into-context` is what supervised mode actually does — the reports are
+  # returned into the orchestrator's context as the tool result. (In roster
+  # mode this value is a no-op and `gate` is the useful one, since there is no
+  # model turn to return to; the scorecard is computed instead.)
+  collect: into-context
   budget_usd: 5
   worker_mcp: inherit   # inherit | none | [server names]
