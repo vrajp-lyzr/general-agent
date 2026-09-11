@@ -29,30 +29,3 @@ skills:
 runtime:
   max_turns: 20
   budget_usd: 5
-
-# ─────────────────────────────────────────────────────────────────────────────
-# THIS BLOCK is what turns the agent into an orchestrator. It is read from THIS
-# FILE at run time — the `orchestration` field on the AgentOS registry doc is a
-# display hint that configures nothing. Remove this block and the agent is an
-# ordinary single-session agent again.
-# ─────────────────────────────────────────────────────────────────────────────
-orchestration:
-  # SUPERVISED: the orchestrator calls `mcp__orchestration__dispatch_many`
-  # mid-turn, the workers run as their own concurrent sessions, and their
-  # reports come back as the tool result — so the closing summary is written
-  # inside the same turn, with no second model call.
-  #
-  # To flip back to roster mode: set `mode: roster`, `collect: gate`, and swap
-  # SOUL.md with SOUL.roster.md. The two prompts are mutually exclusive — the
-  # roster prompt tells the agent to emit JSON and stop, which in supervised
-  # mode means it never calls the tool and dispatches nobody.
-  mode: roster          # roster | supervised
-  isolation: worktree   # worktree | none
-  max_parallel: 2
-  # `into-context` is what supervised mode actually does — the reports are
-  # returned into the orchestrator's context as the tool result. (In roster
-  # mode this value is a no-op and `gate` is the useful one, since there is no
-  # model turn to return to; the scorecard is computed instead.)
-  collect: gate
-  budget_usd: 5
-  worker_mcp: inherit   # inherit | none | [server names]
