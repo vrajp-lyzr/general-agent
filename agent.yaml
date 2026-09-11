@@ -46,13 +46,13 @@ orchestration:
   # SOUL.md with SOUL.roster.md. The two prompts are mutually exclusive — the
   # roster prompt tells the agent to emit JSON and stop, which in supervised
   # mode means it never calls the tool and dispatches nobody.
-  mode: roster          # roster | supervised
+  mode: supervised      # roster | supervised
   isolation: worktree   # worktree | none
   max_parallel: 2
   # `into-context` is what supervised mode actually does — the reports are
   # returned into the orchestrator's context as the tool result. (In roster
   # mode this value is a no-op and `gate` is the useful one, since there is no
   # model turn to return to; the scorecard is computed instead.)
-  collect: gate
+  collect: into-context
   budget_usd: 5
   worker_mcp: inherit   # inherit | none | [server names]
